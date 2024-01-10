@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket</title>
+</head>
+
+<body>
+    <h2>Mensajes</h2>
+    <ul id="mensajes">
+
+    </ul>
+
+    <script>
+        let socket = null;
+        const mensajesUl = document.getElementById("mensajes");
+
+        function pintarMensaje(mensaje) {
+            const li = document.createElement("li");
+            li.innerText = mensaje.emisor + ": " + mensaje.cuerpo;
+
+            mensajesUl.appendChild(li);
+        }
+
+        function conectarServidorWS() {
+            socket = new WebSocket('ws://localhost:3000');
+
+            socket.onopen = event => {
+                console.log("cliente conectado");
+            }
+
+            socket.onclose = event => {
+                console.log("cliente desconectado");
+
+                setTimeout(() => {
+                    conectarServidorWS();
+                }, 3000);
+            }
+
+            socket.onmessage = event => {
+                console.log("mensaje recibido:", event.data);
+                const mensaje = JSON.parse(event.data);
+                
+                pintarMensaje(mensaje);
+            }
+        }
+
+        conectarServidorWS();
+
+    </script>
+</body>
+
+</html>
